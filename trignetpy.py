@@ -27,7 +27,7 @@ def fetch(args):
         if year == start_short:
             start = int(start_dt.strftime('%j'))
         else:
-            start = 0
+            start = 1
         if year == end_short:
             end = int(end_dt.strftime('%j'))
         # end var is used in range which is not inclusive so its days + 1
@@ -35,7 +35,7 @@ def fetch(args):
             end = 367
         else:
             end = 366
-        # Create list of full ftp filepaths of all expected files
+        # Create list of full ftp filepaths of all expected files wi 0 padded julian days
         paths.extend([
             "RefData." + str(year) + "/" + '{0:03d}'.format(day) + "/" + str(product) + "/" + str(station) + '{0:03d}'.format(day) + "Z.zip" 
             for day in list(range(start, end))
@@ -46,18 +46,27 @@ def fetch(args):
     workdir.mkdir(parents=True, exist_ok=True)
     
     # Fetch file from ftp
-    with FTP('ftp.trignet.co.za') as ftp:
-        ftp.login()
-        for path in paths:
-            filepath = '/'.join(path.split('/')[:3])
-            ftp.cwd(filepath)
-            remote_filename = path.split('/')[3]
-            local_filename = workdir / (path.split('/')[0].split('.')[1] + path.split('/')[3])
-            lf = open(str(local_filename), "wb")
-            print("Downloading file {} to {}".format(remote_filename, str(local_filename)))
-            ftp.retrbinary("RETR " + remote_filename, lf.write)
-            ftp.cwd("/")
-
+    for path in paths:
+        filepath = '/'.join(path.split('/')[:3])
+        remote_filename = path.split('/')[3]
+        local_filename = workdir / (path.split('/')[0].split('.')[1] + path.split('/')[3])
+        if local_filename.is_file():
+            print("Local file {} found".format(str(local_filename)))
+            continue
+        try:
+            with FTP('ftp.trignet.co.za') as ftp:
+                ftp.login()
+                print("Change remote path to {}".format(filepath))
+                ftp.cwd(filepath)
+                if remote_filename in ftp.nlst():
+                    print("Remote file found - Downloading file {} to {}".format(remote_filename, str(local_filename)))
+                    lf = open(str(local_filename), "wb")
+                    ftp.retrbinary("RETR " + remote_filename, lf.write)
+                else:
+                    print("Remote file {} not found in {}".format(remote_filename, filepath))
+        except Exception as e:
+            print("FTP error changing dir / downloading. skip. Error code: {}".format(remote_filename, e))
+            
 # Parse input
 def cmd_line_parse(iargs=None):
     EXAMPLE = "example: down_trignet.py -b 20150101 -e 20160701 -s LGBN -p L1L2_30sec"
