@@ -54,7 +54,8 @@ def fetch(args):
             print("Local file {} found".format(str(local_filename)))
             continue
         try:
-            with FTP('ftp.trignet.co.za') as ftp:
+            with FTP('ftp.trignet.co.za', timeout=600) as ftp:
+                #ftp.set_debuglevel(2)
                 ftp.login()
                 print("Change remote path to {}".format(filepath))
                 ftp.cwd(filepath)
@@ -62,6 +63,8 @@ def fetch(args):
                     print("Remote file found - Downloading file {} to {}".format(remote_filename, str(local_filename)))
                     lf = open(str(local_filename), "wb")
                     ftp.retrbinary("RETR " + remote_filename, lf.write)
+                    lf.close()
+                    ftp.close()
                 else:
                     print("Remote file {} not found in {}".format(remote_filename, filepath))
         except Exception as e:
