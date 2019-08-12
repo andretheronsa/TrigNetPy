@@ -2,7 +2,8 @@
 Trignet is a bulk downloader to download zipped GPS data from the South African TrigNet GPS network.
 
 Trgnetpy requires a start date, end date, station code and product description:  
-`python down_trignet.py -b 20150101 -e 20160701 -s LGBN -p L1L2_30sec -d`
+`python down_trignet.py -b 20150101 -e 20160701 -s LGBN -p L1L2_30sec`  
+This will download all the L1L2_30sec data for the Langebaan station between 2015/01/01 and 2016/07/01.
 
 A folder will be created in the current folder where data will be stored.  
 The new folder will be named using the input parameters (start_end_product_station).  
