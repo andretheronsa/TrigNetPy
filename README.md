@@ -1,5 +1,5 @@
 # TrigNetPy
-Trignet is a bulk downloader to download zipped GPS data from the South African TrigNet GPS network.
+Trignetpy is a bulk downloader to download zipped GPS data from the South African TrigNet GPS network.
 
 Trgnetpy requires a start date, end date, station code and product description:  
 `python down_trignet.py -b 20150101 -e 20160701 -s LGBN -p L1L2_30sec`  
