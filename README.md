@@ -17,5 +17,6 @@ It will automatically set the start date to not before 2000-01-01 or the end dat
 Only Python3 is required to run.
 
 # Notes 
-Very little testing has been done and program will likely fail and not deal with ftp exceptions well.
--d toggles FTP debug mode for extra info if your downloads are failing
+Very little testing has been done and program will likely fail and not deal with ftp exceptions well.  
+*  -d toggles FTP debug mode for extra info if your downloads are failing  
+*  -h For help  
