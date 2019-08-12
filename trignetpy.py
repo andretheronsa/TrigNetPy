@@ -1,5 +1,5 @@
 ############################################################
-# Project: Trignet bulk downloader                        #
+# Project: Trignet bulk downloader                         #
 # Author: Andre Theron (andretheronsa@gmail.com)           #
 # Created: July 2019                                       #
 ############################################################
