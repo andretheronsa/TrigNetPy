@@ -19,7 +19,7 @@ def fetch(args):
         print("End date before start date - exit")
         return
 
-    # Check if end date is later than today - use today if it is
+    # Check if start date is earlier than data aquisition start on 2000/01/01- fix if it is
     start_dt = datetime.datetime.strptime(str(start_date), '%Y%m%d')
     first_data = datetime.datetime.strptime('20000101', '%Y%m%d')
     if start_dt > first_data:
