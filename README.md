@@ -10,7 +10,7 @@ The new folder will be named using the input parameters (start_end_product_stati
 All the available products will be downloaded to this one folder.  
 Since the product filenames on Trignet are named only according to station name and julian day there would be  
 confusion for data on the same days for the same stations over different years.  
-The short year (15, 16, 17 etc.) is therefore prefixed to the GPS data.  
+The short year (15, 16, 17 etc.) is therefore prefixed to the file name.  
 
 
 # Installation
