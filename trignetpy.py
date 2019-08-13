@@ -1,5 +1,5 @@
 ############################################################
-# Project: Trignet bulk downloader                         #
+# Project: Trignet bulk downloader                        #
 # Author: Andre Theron (andretheronsa@gmail.com)           #
 # Created: July 2019                                       #
 ############################################################
@@ -8,6 +8,7 @@ from ftplib import FTP
 import datetime
 from pathlib import Path
 import argparse
+import zipfile
 
 # Main fetching program
 def fetch(args):
@@ -19,7 +20,7 @@ def fetch(args):
         print("End date before start date - exit")
         return
 
-    # Check if start date is earlier than data aquisition start on 2000/01/01- fix if it is
+    # Check if end date is later than today - use today if it is
     start_dt = datetime.datetime.strptime(str(start_date), '%Y%m%d')
     first_data = datetime.datetime.strptime('20000101', '%Y%m%d')
     if start_dt > first_data:
@@ -82,29 +83,57 @@ def fetch(args):
         remote_filename = path.split('/')[3]
         local_filename = workdir / (path.split('/')[0].split('.')[1] + path.split('/')[3])
 
-        # Check if file is already there
+        # Check if file is already there and valid
         if local_filename.is_file():
-            print("Local file {} found".format(str(local_filename)))
-            continue
+            try:
+                with zipfile.ZipFile(local_filename, 'r') as archive:
+                    test = archive.namelist()
+                    print("Local file {} found and is a valid zipfile".format(str(local_filename)))
+                    continue
+            except:
+                print("Local file {} found but is not valid zipfile - continue download".format(str(local_filename)))
         
         # Log into trignet, change dir and download file
-        try:
-            with FTP('ftp.trignet.co.za', timeout=600) as ftp:
-                ftp.set_debuglevel(debug_level)
-                ftp.login()
-                print("Change remote path to {}".format(filepath))
-                ftp.cwd(filepath)
-                if remote_filename in ftp.nlst():
-                    print("Remote file found - Downloading file {} to {}".format(remote_filename, str(local_filename)))
-                    lf = open(str(local_filename), "wb")
-                    ftp.retrbinary("RETR " + remote_filename, lf.write)
-                    lf.close()
-                    ftp.close()
+        tried_download = False
+        tried_check = False
+        while True:
+            try:
+                with FTP('ftp.trignet.co.za', timeout=600) as ftp:
+                    ftp.set_debuglevel(debug_level)
+                    ftp.login()
+                    print("Change remote path to {}".format(filepath))
+                    ftp.cwd(filepath)
+                    if remote_filename in ftp.nlst():
+                        print("Remote file found - Downloading file {} to {}".format(remote_filename, str(local_filename)))
+                        lf = open(str(local_filename), "wb")
+                        ftp.retrbinary("RETR " + remote_filename, lf.write)
+                        lf.close()
+                        ftp.close()
+                    else:
+                        print("Remote file {} not found in {}".format(remote_filename, filepath))
+                        break
+            except Exception as e:
+                if not tried_download:
+                    print("FTP error while changing dir / downloading. Try once more. Error code: {}".format(remote_filename, e))
+                    tried_download = True
                 else:
-                    print("Remote file {} not found in {}".format(remote_filename, filepath))
-        except Exception as e:
-            print("FTP error while changing dir / downloading. skip. Error code: {}".format(remote_filename, e))
-            
+                    print("FTP error while changing dir / downloading. Already tried so skip. Error code: {}".format(remote_filename, e))
+                    break
+
+            # Test if downloaded file is valid - try once more if not
+            try:
+                with zipfile.ZipFile(local_filename, 'r') as archive:
+                    test = archive.namelist()
+                    print("{} file downloaded and archive check passed".format(str(local_filename)))
+                    break
+            except Exception as e:
+                if not tried_check:
+                    print("{} file downloaded but archive check failed - try once more".format(str(local_filename)))
+                    tried_check = True
+                else:
+                    print("{} file downloaded but archive check failed - Already tried - delete corrupt file and skip".format(str(local_filename)))
+                    local_filename.unlink()
+                    break
 # Parse input
 def cmd_line_parse(iargs=None):
     EXAMPLE = "example: down_trignet.py -b 20150101 -e 20160701 -s LGBN -p L1L2_30sec"
