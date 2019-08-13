@@ -13,9 +13,9 @@ confusion for data on the same days for the same stations over different years.
 The short year (15, 16, 17 etc.) is therefore prefixed to the file name.  
 
 # Extract_height.py
-Small little script to extract all the WGS84 heights from the bulk downloaded zip files.
-Run in the folder containing the downloaded files.
-It crates a CSV with the height files
+Small little script to extract all the WGS84 heights from the bulk downloaded zip files.  
+Run in the folder containing the downloaded files.  
+It crates a CSV with the dates and heights
 
 # Installation
 Only Python3 is required to run.
